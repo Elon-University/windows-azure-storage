@@ -124,7 +124,14 @@ function windows_azure_storage_plugin_register_settings() {
 	if ( ! defined( 'MICROSOFT_AZURE_CACHE_CONTROL' ) ) {
 		register_setting( 'windows-azure-storage-settings-group', 'azure_cache_control', 'sanitize_text_field' );
 	}
-
+	
+	/**
+	* Add section to remove axzure media editor button
+	* 
+	* @ since 4.3.2 
+	*/
+	register_setting('windows-azure-storage-settings-group', 'azure_remove_media_button', 'wp_validate_boolean');
+	
 	/**
 	 * @since 4.0.0
 	 */
@@ -214,7 +221,38 @@ function windows_azure_storage_plugin_register_settings() {
 		'windows-azure-storage-plugin-options',
 		'windows-azure-storage-settings'
 	);
+
+		
+	/**
+	 * @since 4.3.2
+	 */
+	add_settings_field(
+		'azure_remove_media_button', 
+		__('Remove Azure Library Button', 'windows-azure-storage'), 
+		'windows_azure_remove_media_library_button', 
+		'windows-azure-storage-plugin-options', 
+		'windows-azure-storage-settings'
+	);
 }
+
+/**
+ * Remove media button section callback function 
+ * 
+ * @since 4.3.2
+ *
+ * @return void
+ */
+ function windows_azure_remove_media_library_button(){
+	?>
+	
+	<input type="checkbox" name="azure_remove_media_button" title="<?php esc_attr_e('Remove azure media library button', 'windows-azure-storage'); ?>" value="true" id="azure_remove_media_button" value="1" <?php checked( (bool) get_option('azure_remove_media_button')); ?>/>
+	
+	<label for="azure_remove_media_button">
+		<?php esc_html_e('Remove the Azure media library button from the editor toolbar', 'windows-azure-storage'); ?>
+	</label>
+
+	<?php
+ }
 
 /**
  * Settings section callback function.
