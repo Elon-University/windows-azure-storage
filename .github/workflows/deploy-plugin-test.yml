@@ -1,0 +1,79 @@
+name: Deploy WP Plugin to Test
+
+# Controls when the workflow will run 
+on:
+  # Triggers the workflow on push or pull request events but only for the test branch
+  push:
+    branches: [test]
+
+  pull_request:
+    types: [merged]
+    branches: [test]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  Lint-PHP:
+    runs-on: self-hosted
+    name: Lint PHP
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: PHP Lint
+        uses: michaelw90/PHP-Lint@master
+  Deploy-WPTest01:
+    needs: Lint-PHP
+    runs-on: self-hosted
+    name: Deploy to WPTest01
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Deploy wptest01
+        id: deploy01
+        uses: Pendect/action-rsyncer@v1.1.0
+        env:
+          DEPLOY_KEY: ${{ secrets.TEST_SSH_KEY }}
+        with:
+          flags: '-avzRe --delete --rsync-path="mkdir -p ${{ secrets.TEST_PATH_PLUGINS }}/${{ secrets.DEPLOY_DIR }} && rsync"'
+          options: ''
+          ssh_options: '-p 22'
+          src: './*'
+          dest: '${{ secrets.TEST_USER }}@${{ secrets.TEST_ADDR_01 }}:${{ secrets.TEST_PATH_PLUGINS }}/${{ secrets.DEPLOY_DIR }}'
+  Deploy-WPTest02:
+    needs: Lint-PHP
+    runs-on: self-hosted
+    name: Deploy to WPTest02
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Deploy wptest02
+        id: deploy02
+        uses: Pendect/action-rsyncer@v1.1.0
+        env:
+          DEPLOY_KEY: ${{ secrets.TEST_SSH_KEY }}
+        with:
+          flags: '-avzRe --delete --rsync-path="mkdir -p ${{ secrets.TEST_PATH_PLUGINS }}/${{ secrets.DEPLOY_DIR }} && rsync"'
+          options: ''
+          ssh_options: '-p 22'
+          src: './*'
+          dest: '${{ secrets.TEST_USER }}@${{ secrets.TEST_ADDR_02 }}:${{ secrets.TEST_PATH_PLUGINS }}/${{ secrets.DEPLOY_DIR }}'
+  Deploy-WPTest03:
+    needs: Lint-PHP
+    runs-on: self-hosted
+    name: Deploy to WPTest03
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Deploy wptest03
+        id: deploy03
+        uses: Pendect/action-rsyncer@v1.1.0
+        env:
+          DEPLOY_KEY: ${{ secrets.TEST_SSH_KEY }}
+        with:
+          flags: '-avzRe --delete --rsync-path="mkdir -p ${{ secrets.TEST_PATH_PLUGINS }}/${{ secrets.DEPLOY_DIR }} && rsync"'
+          options: ''
+          ssh_options: '-p 22'
+          src: './*'
+          dest: '${{ secrets.TEST_USER }}@${{ secrets.TEST_ADDR_03 }}:${{ secrets.TEST_PATH_PLUGINS }}/${{ secrets.DEPLOY_DIR }}'
