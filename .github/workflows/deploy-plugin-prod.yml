@@ -1,0 +1,97 @@
+name: Deploy WP Plugin to Production
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [main]
+
+  pull_request:
+    types: [merged]
+    branches: [main]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  Lint-PHP:
+    runs-on: self-hosted
+    name: Lint PHP
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: PHP Lint
+        uses: michaelw90/PHP-Lint@master
+  Deploy-WPFront01:
+    needs: Lint-PHP
+    runs-on: self-hosted
+    name: Deploy to WPFront01
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Deploy wpfront01
+        id: deploy01
+        uses: Pendect/action-rsyncer@v1.1.0
+        env:
+          DEPLOY_KEY: ${{ secrets.PROD_SSH_KEY }}
+        with:
+          flags: '-avzRe --delete --rsync-path="mkdir -p ${{ secrets.PROD_PATH_PLUGINS }}/${{ secrets.DEPLOY_DIR }} && rsync"'
+          options: ''
+          ssh_options: '-p 22'
+          src: './*'
+          dest: '${{ secrets.PROD_USER }}@${{ secrets.PROD_ADDR_01 }}:${{ secrets.PROD_PATH_PLUGINS }}/${{ secrets.DEPLOY_DIR }}'
+  Deploy-WPFront02:
+    needs: Lint-PHP
+    runs-on: self-hosted
+    name: Deploy to WPFront02
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Deploy wpfront02
+        id: deploy02
+        uses: Pendect/action-rsyncer@v1.1.0
+        env:
+          DEPLOY_KEY: ${{ secrets.PROD_SSH_KEY }}
+        with:
+          flags: '-avzRe --delete --rsync-path="mkdir -p ${{ secrets.PROD_PATH_PLUGINS }}/${{ secrets.DEPLOY_DIR }} && rsync"'
+          options: ''
+          ssh_options: '-p 22'
+          src: './*'
+          dest: '${{ secrets.PROD_USER }}@${{ secrets.PROD_ADDR_02 }}:${{ secrets.PROD_PATH_PLUGINS }}/${{ secrets.DEPLOY_DIR }}'
+  Deploy-WPFront03:
+    needs: Lint-PHP
+    runs-on: self-hosted
+    name: Deploy to WPFront03
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Deploy wpfront03
+        id: deploy03
+        uses: Pendect/action-rsyncer@v1.1.0
+        env:
+          DEPLOY_KEY: ${{ secrets.PROD_SSH_KEY }}
+        with:
+          flags: '-avzRe --delete --rsync-path="mkdir -p ${{ secrets.PROD_PATH_PLUGINS }}/${{ secrets.DEPLOY_DIR }} && rsync"'
+          options: ''
+          ssh_options: '-p 22'
+          src: './*'
+          dest: '${{ secrets.PROD_USER }}@${{ secrets.PROD_ADDR_03 }}:${{ secrets.PROD_PATH_PLUGINS }}/${{ secrets.DEPLOY_DIR }}'
+  Deploy-WPFront04:
+    needs: Lint-PHP
+    runs-on: self-hosted
+    name: Deploy to WPFront04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Deploy wpfront04
+        id: deploy04
+        uses: Pendect/action-rsyncer@v1.1.0
+        env:
+          DEPLOY_KEY: ${{ secrets.PROD_SSH_KEY }}
+        with:
+          flags: '-avzRe --delete --rsync-path="mkdir -p ${{ secrets.PROD_PATH_PLUGINS }}/${{ secrets.DEPLOY_DIR }} && rsync"'
+          options: ''
+          ssh_options: '-p 22'
+          src: './*'
+          dest: '${{ secrets.PROD_USER }}@${{ secrets.PROD_ADDR_04 }}:${{ secrets.PROD_PATH_PLUGINS }}/${{ secrets.DEPLOY_DIR }}'
